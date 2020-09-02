@@ -51,3 +51,4 @@ int main() {
     memset(memo, -1, sizeof(memo));
 	printf("%i\n", dfsearch(0, 1, 0, numSecond - 1));
 }
+
