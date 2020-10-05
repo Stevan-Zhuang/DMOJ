@@ -1,4 +1,3 @@
-# how tf is this a 7 pointer this took me hours
 from collections import namedtuple
 from itertools import permutations, combinations
 from math import sqrt
