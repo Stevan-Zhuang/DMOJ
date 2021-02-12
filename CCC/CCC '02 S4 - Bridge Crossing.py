@@ -1,33 +1,22 @@
-from math import inf
+limit = int(input())
+n_people = int(input())
 
-group_limit = int(input())
-num_people = int(input())
+data = [(input(), int(input())) for _ in range(n_people)]
+names, times = zip(*data)
 
-names = []
-times = []
-for person in range(num_people):
-    names.append(input())
-    times.append(int(input()))
+dp = [0] + [float('inf')] * n_people
+dp_names = [[0]] + [[] for _ in range(n_people)]
 
-best_times = [0] + [inf] * num_people
-shifts = [0] * num_people
-for idx in range(num_people):
+for idx in range(1, n_people + 1):
     max_time = 0
-    for shift in range(group_limit):
-        if idx + shift >= num_people:
-            break
-        max_time = max(max_time, times[idx + shift])
-        if best_times[idx] + max_time < best_times[idx + shift + 1]:
-            best_times[idx + shift + 1] = best_times[idx] + max_time
-            shifts[idx + shift] = shift + 1
+    for shift in range(1, min(idx, limit) + 1):
+        max_time = max(max_time, times[idx - shift])
+        if dp[idx] > dp[idx - shift] + max_time:
+            dp[idx] = dp[idx - shift] + max_time
+            dp_names[idx] = dp_names[idx - shift] + [idx]
 
-print("Total Time:", best_times[-1])
-
-is_newline = [False] * num_people
-idx = num_people - 1
-while idx > 0:
-    idx -= shifts[idx]
-    is_newline[idx] = True
-
-for name, newline in zip(names, is_newline):
-    print(name, end="\n" if newline else " ")
+print(f"Total Time: {dp[-1]}")
+n_groups = len(dp_names[-1]) - 1
+for idx in range(n_groups):
+    start, end = dp_names[-1][idx], dp_names[-1][idx + 1]
+    print(" ".join(names[start: end]))
