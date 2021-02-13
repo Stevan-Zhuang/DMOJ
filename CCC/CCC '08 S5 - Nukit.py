@@ -1,35 +1,18 @@
-def get_possible_moves(num_a, num_b, num_c, num_d):
-    possible_moves = {(num_a - 2, num_b - 1, num_c,     num_d - 2),
-                      (num_a - 1, num_b - 1, num_c - 1, num_d - 1),
-                      (num_a,     num_b,     num_c - 2, num_d - 1),
-                      (num_a,     num_b - 3, num_c,     num_d),
-                      (num_a - 1, num_b,     num_c,     num_d - 1)}
+memo = {}
+def can_win(a, b, c, d):
+    if (a, b, c, d) in memo:
+        return memo[(a, b, c, d)]
+    moves = [(a - 2, b - 1, c    , d - 2),
+             (a - 1, b - 1, c - 1, d - 1),
+             (a    , b    , c - 2, d - 1),
+             (a    , b - 3, c    , d    ),
+             (a - 1, b    , c    , d - 1)]
+    moves = [move for move in moves if all(p >= 0 for p in move)]
+    result = any(not can_win(*move) for move in moves)
+    memo[(a, b, c, d)] = result
+    return result
 
-    possible_moves = {(num_a, num_b, num_c, num_d) for num_a, num_b, num_c, num_d in possible_moves
-                      if num_a >= 0 and num_b >= 0 and num_c >= 0 and num_d >= 0}
-
-    return possible_moves
-
-cache = {}
-
-def always_wins(particles, moves_made = 0):
-    if (particles, moves_made % 2) in cache:
-        return cache[(particles, moves_made % 2)]
-
-    num_a, num_b, num_c, num_d = particles
-    possible_moves = get_possible_moves(num_a, num_b, num_c, num_d)
-    if len(possible_moves) == 0:
-        return moves_made % 2 == 1
-
-    if moves_made % 2 == 0:
-        result = any(always_wins(move, moves_made + 1) for move in possible_moves)
-        cache[(particles, 0)] = result
-        return result
-    if moves_made % 2 == 1:
-        result = all(always_wins(move, moves_made + 1) for move in possible_moves)
-        cache[(particles, 1)] = result
-        return result
-
-for case in range(int(input())):
-    particles = tuple(int(data) for data in input().split())
-    print("Patrick" if always_wins(particles) else "Roland")
+n_cases = int(input())
+for _ in range(n_cases):
+    a, b, c, d = [int(data) for data in input().split()]
+    print("Patrick" if can_win(a, b, c, d) else "Roland")
