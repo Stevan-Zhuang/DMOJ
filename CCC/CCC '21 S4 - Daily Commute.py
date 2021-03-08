@@ -1,6 +1,6 @@
 from collections import deque
 input = __import__('sys').stdin.readline
-INF = float('inf')
+INF = 0x3f3f3f3f
 
 n_stations, n_paths, n_days = [int(data) for data in input().split()]
 
@@ -23,39 +23,22 @@ while queue:
 segment_tree = [INF] * (2 * (n_stations + 1))
 
 def update(idx, value):
+    idx += 1
     idx += n_stations
     segment_tree[idx] = value
     while idx > 1:
         segment_tree[idx >> 1] = min(segment_tree[idx], segment_tree[idx ^ 1])
         idx >>= 1
 
-def query(left, right):
-    result = INF
-    left += n_stations
-    right += n_stations
-    while left < right:
-        if left & 1:
-            result = min(result, segment_tree[left])
-            left += 1
-        if right & 1:
-            right -= 1
-            result = min(result, segment_tree[right])
-        left >>= 1
-        right >>= 1
-    return result
-
-path = [0] + [int(data) for data in input().split()]
-for idx in range(1, n_stations + 1):
-    steps = idx - 1
-    update(idx, min_dist[path[idx]] + steps)
+path = [int(data) for data in input().split()]
+for idx in range(n_stations):
+    update(idx, min_dist[path[idx]] + idx)
 
 for _ in range(n_days):
-    x, y = [int(data) for data in input().split()]
-    x_steps, y_steps = x - 1, y - 1
-
+    x, y = [int(data) - 1 for data in input().split()]
     path[x], path[y] = path[y], path[x]
 
-    update(x, min_dist[path[x]] + x_steps)
-    update(y, min_dist[path[y]] + y_steps)
+    update(x, min_dist[path[x]] + x)
+    update(y, min_dist[path[y]] + y)
 
-    print(query(1, n_stations + 1))
+    print(segment_tree[1])
