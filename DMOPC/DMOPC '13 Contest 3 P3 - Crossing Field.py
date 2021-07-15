@@ -1,24 +1,27 @@
 import sys
-sys.setrecursionlimit(1000000)
+from collections import deque
+input = sys.stdin.readline
 
-field_size, max_elevation = [int(data) for data in input().split()]
-field = [[int(data) for data in input().split()] for row in range(field_size)]
+N, H = map(int, input().split())
+field = [list(map(int, input().split())) for _ in range(N)]
 
-been_to = [[False for col in range(field_size)] for row in range(field_size)]
-
+visited = [[False for _ in range(N)] for _ in range(N)]
+visited[0][0] = True
 orients = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
-
-def can_cross(col, row):
-    been_to[row][col] = True
-    if col == field_size - 1 and row == field_size - 1:
-        return True
+queue = deque([(0, 0)])
+while queue:
+    col, row = queue.pop()
+    if col == row == N - 1:
+        print("yes")
+        sys.exit()
 
     for orient in orients:
-        if (0 <= col + orient[0] < field_size and 0 <= row + orient[1] < field_size and
-                abs(field[row][col] - field[row + orient[1]][col + orient[0]]) <= max_elevation and
-                not been_to[row + orient[1]][col + orient[0]]):
-            if can_cross(col + orient[0], row + orient[1]):
-                return True
+        new_col, new_row = col + orient[0], row + orient[1]
+        if (0 <= new_col < N and 0 <= new_row < N and
+                abs(field[row][col] - field[new_row][new_col]) <= H and
+                not visited[new_row][new_col]):
+            visited[new_row][new_col] = True
+            queue.append((new_col, new_row))
 
-print("yes" if can_cross(0, 0) else "no")
+print("no")
